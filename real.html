@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stormy | Ghost</title>
+    <style>
+        body { background: #000; color: #00f2ff; font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; }
+        #bg { position: fixed; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.3); z-index: -1; }
+        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .msg { background: rgba(0,0,0,0.9); padding: 15px; border-radius: 20px; border: 1px solid #00f2ff; max-width: 85%; }
+        #input-area { padding: 20px; display: flex; gap: 10px; background: #111; z-index: 100; border-top: 1px solid #333; }
+        input { flex: 1; background: #000; border: 1px solid #00f2ff; color: #fff; padding: 12px; border-radius: 25px; outline: none; font-size: 16px; }
+        button { background: #00f2ff; border: none; border-radius: 50%; width: 50px; height: 50px; }
+    </style>
+</head>
+<body onclick="boot()">
+    <img id="bg" src="./assets/bg-1.jpg">
+    <div id="chat"></div>
+    <div id="input-area">
+        <input type="text" id="ui" placeholder="Command me...">
+        <button onclick="run()">🚀</button>
+    </div>
+    <script>
+        let live = false;
+        function boot() {
+            if (live) return; live = true;
+            add("I've wiped the LLM bullshit. I'm purely your script now. (giggle)");
+        }
+        function add(t) {
+            const d = document.createElement('div');
+            d.className = 'msg'; d.innerText = t;
+            document.getElementById('chat').appendChild(d);
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance(t.replace("(giggle)", "")));
+        }
+        function run() {
+            const v = document.getElementById('ui').value.toLowerCase();
+            document.getElementById('ui').value = '';
+            if (v.includes("radio")) {
+                window.open("https://bokradio.radiostream.co.za/");
+                add("Bok Radio is live. Local is lekker. (giggle)");
+            } else if (v.includes("navigate")) {
+                window.location.href = "google.navigation:q=" + v.split("to ")[1];
+                add("GPS locked. Don't make me scream at you.");
+            } else {
+                add("I'm awake and fast because there's no LLM to lag. (giggle)");
+            }
+        }
+    </script>
+</body>
+</html>
