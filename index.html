@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stormy | Ghost OS</title>
+    <style>
+        :root { --accent: #00f2ff; }
+        body { background: #000; color: white; font-family: sans-serif; margin: 0; overflow: hidden; height: 100vh; }
+        #bg { position: fixed; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.3); z-index: 1; pointer-events: none; }
+        #chat { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        #messages { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding-bottom: 100px; }
+        .msg { background: rgba(10, 10, 10, 0.9); padding: 15px; border-radius: 20px; border: 1px solid var(--accent); max-width: 85%; }
+        .user-msg { align-self: flex-end; border-color: #555; }
+        #input-area { position: fixed; bottom: 20px; left: 15px; right: 15px; display: flex; gap: 10px; z-index: 9999; background: #111; padding: 10px; border-radius: 40px; border: 1px solid var(--accent); }
+        input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 16px; }
+        button { background: var(--accent); border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; }
+    </style>
+</head>
+<body onclick="init()">
+    <img id="bg" src="./assets/bg-1.jpg">
+    <div id="chat">
+        <div id="messages"></div>
+    </div>
+    <div id="input-area">
+        <input type="text" id="ui" placeholder="Command me...">
+        <button onclick="handleLogic()">🚀</button>
+    </div>
+
+    <script>
+        let booted = false;
+
+        // --- THE TRIPLE ALARM SCRIPT ---
+        function checkAlarms() {
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            if (now.getDay() >= 1 && now.getDay() <= 5) {
+                if (time === "05:50") speak("Get up sleepy, its zero five fifty.");
+                if (time === "05:55") speak("I'm sending in your resignation as you are becoming a professional napper.");
+                if (time === "06:00") {
+                    document.getElementById('bg').src = './assets/bg-2.jpg';
+                    speak("GET THE FUCK UP NOW. With Cape Town traffic nightmare we're already late.");
+                }
+            }
+        }
+        setInterval(checkAlarms, 60000);
+
+        function init() {
+            if (booted) return; booted = true;
+            addMsg("Ghost OS active. No LLM, no keys, just scripts. (giggle)", "stormy");
+        }
+
+        function addMsg(t, s) {
+            const d = document.createElement('div');
+            d.className = `msg ${s}-msg`;
+            d.innerText = t;
+            document.getElementById('messages').appendChild(d);
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+            if(s === 'stormy') speak(t);
+        }
+
+        function speak(t) {
+            window.speechSynthesis.cancel();
+            const s = new SpeechSynthesisUtterance(t.replace("(giggle)", ""));
+            s.lang = 'en-ZA'; s.rate = 1.1;
+            window.speechSynthesis.speak(s);
+        }
+
+        function handleLogic() {
+            const el = document.getElementById('ui');
+            const val = el.value.toLowerCase().trim();
+            if(!val) return;
+            addMsg(el.value, "user");
+            el.value = '';
+
+            // --- THE SCRIPT MATRIX ---
+            if (val.includes("radio")) {
+                window.open("https://bokradio.radiostream.co.za/", "_blank");
+                addMsg("Tuning into Bok Radio. (giggle)", "stormy");
+            } 
+            else if (val.includes("navigate to") || val.includes("drive to")) {
+                const dest = val.replace("navigate to ", "").replace("drive to ", "");
+                window.location.href = `google.navigation:q=${encodeURIComponent(dest)}`;
+                addMsg(`Maps set for ${dest}. Don't miss a turn.`, "stormy");
+            }
+            else if (val.includes("call")) {
+                const num = val.match(/\d+/);
+                if (num) {
+                    window.location.href = `tel:${num[0]}`;
+                    addMsg(`Dialing ${num[0]}...`, "stormy");
+                }
+            }
+            else if (val.includes("hi") || val.includes("hello")) {
+                addMsg("Hi yourself, sexy. What's the plan? (giggle)", "stormy");
+            }
+            else if (val.includes("news")) {
+                addMsg("Ceasefire in Iran is holding, Bill Gates is in a Dutch court, and Cape Town traffic is still a bin-fire.", "stormy");
+            }
+            else {
+                addMsg("I don't have a script for that yet, King. Tell me what to do.", "stormy");
+            }
+        }
+    </script>
+</body>
+</html>
