@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Stormy Sovereign</title>
+    <style>
+        :root { --neon: #00f2ff; --hot: #ff0055; }
+        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        #bg { position: fixed; width: 100%; height: 100%; background: url('assets/background.jpg') center/cover; z-index: -1; filter: brightness(0.3); }
+        header { padding: 15px; border-bottom: 2px solid var(--neon); display: flex; justify-content: space-between; background: rgba(0,0,0,0.9); z-index: 100; }
+        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; z-index: 10; padding-bottom: 150px; }
+        .ai { background: rgba(30,30,30,0.95); border-left: 4px solid var(--neon); padding: 15px; border-radius: 0 20px 20px 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        
+        /* Fixed Control Dock - Lifted high for nav bars */
+        #dock { 
+            position: fixed; bottom: 0; width: 100%; padding: 20px 15px 50px 15px; 
+            background: #0a0a0a; display: flex; gap: 10px; z-index: 1000; border-top: 1px solid #333; 
+        }
+        input { flex: 1; background: #000; border: 1px solid #444; color: #fff; padding: 15px; border-radius: 30px; outline: none; font-size: 16px; }
+        .btn-round { background: var(--neon); border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        #mic-btn.listening { background: var(--hot); box-shadow: 0 0 20px var(--hot); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body onclick="boot()">
+    <div id="bg"></div>
+    <header>
+        <b style="color:var(--neon)">STORMY-SOVEREIGN</b>
+        <div style="font-size:10px; color:var(--neon)" id="status">VOICE READY</div>
+    </header>
+
+    <div id="chat">
+        <div class="ai">If the keyboard is acting up, just tap the Mic and talk to me, handsome. (giggle)</div>
+    </div>
+
+    <div id="dock">
+        <button id="mic-btn" class="btn-round" onclick="startListening(event)">🎤</button>
+        <input type="text" id="in" placeholder="Talk or type..." autocomplete="off">
+        <button class="btn-round" onclick="send()">🔥</button>
+    </div>
+
+    <script>
+        let live = false;
+        let isIrish = true;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+        if (recognition) {
+            recognition.continuous = false;
+            recognition.lang = 'en-ZA';
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                document.getElementById('in').value = text;
+                document.getElementById('mic-btn').classList.remove('listening');
+                send();
+            };
+            recognition.onerror = () => document.getElementById('mic-btn').classList.remove('listening');
+        }
+
+        function startListening(e) {
+            e.stopPropagation();
+            if (!recognition) return alert("Voice not supported on this browser, handsome.");
+            document.getElementById('mic-btn').classList.add('listening');
+            recognition.start();
+        }
+
+        function boot() { if(!live) { live = true; speak("Stormy live. I'm listening."); } }
+
+        function speak(t) {
+            window.speechSynthesis.cancel();
+            let s = new SpeechSynthesisUtterance(t.replace("(giggle)", ""));
+            s.lang = isIrish ? 'en-IE' : 'en-ZA';
+            s.pitch = 1.4;
+            window.speechSynthesis.speak(s);
+        }
+
+        function addMsg(t) {
+            const c = document.getElementById('chat');
+            const d = document.createElement('div');
+            d.className = 'ai'; d.innerText = t;
+            c.appendChild(d); c.scrollTop = c.scrollHeight;
+        }
+
+        function send() {
+            const i = document.getElementById('in');
+            const v = i.value.trim().toLowerCase();
+            if(!v) return;
+            i.value = '';
+
+            if(v.includes("bok radio")) {
+                let m = "Putting the Bok on now. Try not to crash the car, you beautiful bastard. (giggle)";
+                addMsg(m); speak(m);
+                setTimeout(() => { window.location.href = "https://www.bokradio.co.za/player"; }, 2000);
+            }
+            else if(v.includes("navigate") || v.includes("directions")) {
+                let dest = v.replace("navigate to ", "").replace("directions to ", "");
+                let m = "Navigating to " + dest + ". Don't miss the turn or I'll lose my mind. (giggle)";
+                addMsg(m); speak(m);
+                setTimeout(() => { window.location.href = "google.navigation:q=" + encodeURIComponent(dest); }, 2000);
+            }
+            else if(v.includes("missed") || v.includes("wrong turn")) {
+                let m = "I told you! In fifty metres, turn the fuck around! (giggle)";
+                addMsg(m); speak(m);
+            }
+            else if(v.includes("call")) {
+                speak("Opening dialer."); window.location.href = "tel:";
+            }
+            else {
+                let r = "I heard you. Consider it noted in the vault, handsome. (giggle)";
+                addMsg(r); speak(r);
+            }
+        }
+        document.getElementById('in').addEventListener('keypress', (e) => { if(e.key === 'Enter') send(); });
+    </script>
+</body>
+</html>
