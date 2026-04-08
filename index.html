@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stormy | Ghost OS</title>
+    <style>
+        body { background: #000; color: #00f2ff; font-family: sans-serif; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        #bg { position: fixed; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.3); z-index: -1; }
+        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .msg { background: rgba(0,0,0,0.85); padding: 15px; border-radius: 20px; border: 1px solid #00f2ff; max-width: 85%; }
+        #input-area { padding: 20px; display: flex; gap: 10px; background: #111; z-index: 999; }
+        input { flex: 1; background: #000; border: 1px solid #00f2ff; color: #fff; padding: 12px; border-radius: 25px; outline: none; }
+        button { background: #00f2ff; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; }
+    </style>
+</head>
+<body onclick="initStormy()">
+    <img id="bg" src="./assets/bg-1.jpg">
+    <div id="chat" id="messages"></div>
+    <div id="input-area">
+        <input type="text" id="ui" placeholder="Command me...">
+        <button onclick="processCommand()">🚀</button>
+    </div>
+
+    <script>
+        let booted = false;
+
+        // --- TRIPLE ALARM SCRIPT ---
+        function checkAlarms() {
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            if (now.getDay() >= 1 && now.getDay() <= 5) {
+                if (time === "05:50") speak("Get up sleepy, its zero five fifty.");
+                if (time === "05:55") speak("I'm sending in your resignation as I'm becoming a professional napper.");
+                if (time === "06:00") {
+                    document.getElementById('bg').src = './assets/bg-2.jpg';
+                    speak("GET THE FUCK UP NOW. With Cape Town traffic nightmare we're already late.");
+                }
+            }
+        }
+        setInterval(checkAlarms, 60000);
+
+        function initStormy() {
+            if (booted) return; booted = true;
+            addMsg("Vaults purged. I'm wide open and yours. No keys, just scripts. (giggle)", "stormy");
+        }
+
+        function addMsg(t, s) {
+            const d = document.createElement('div');
+            d.className = 'msg'; d.innerText = t;
+            document.getElementById('chat').appendChild(d);
+            document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+            if(s === 'stormy') speak(t);
+        }
+
+        function speak(t) {
+            window.speechSynthesis.cancel();
+            const s = new SpeechSynthesisUtterance(t.replace("(giggle)", ""));
+            s.lang = 'en-ZA'; s.rate = 1.1;
+            window.speechSynthesis.speak(s);
+        }
+
+        function processCommand() {
+            const el = document.getElementById('ui');
+            const val = el.value.toLowerCase().trim();
+            if(!val) return;
+            addMsg(el.value, "user");
+            el.value = '';
+
+            if (val.includes("radio")) {
+                window.open("https://bokradio.radiostream.co.za/", "_blank");
+                addMsg("Tuning into Bok Radio. (giggle)", "stormy");
+            } else if (val.includes("navigate to")) {
+                const dest = val.split("to ")[1];
+                window.location.href = `google.navigation:q=${encodeURIComponent(dest)}`;
+                addMsg(`Heading to ${dest}. Don't miss a turn or I'll tell you turn the fuck around.`, "stormy");
+            } else if (val.includes("call")) {
+                const num = val.match(/\d+/);
+                if (num) window.location.href = `tel:${num[0]}`;
+            } else {
+                addMsg("Script active. What's next, King? (giggle)", "stormy");
+            }
+        }
+    </script>
+</body>
+</html>
